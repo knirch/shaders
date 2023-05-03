@@ -1,0 +1,36 @@
+#!/usr/bin/python3
+
+import requests
+
+from urllib.parse import urlparse
+
+import sys
+import json
+
+# /view/tsSSDc, tsSSDc, https://www.shadertoy.com/view/tsSSDc -> tsSSDc
+shader = urlparse(sys.argv[1]).path.split("/")[-1]
+
+r = requests.post("https://www.shadertoy.com/shadertoy",
+                  data={
+                      'nt':1,'nl':1,'np':1, 's': json.dumps({ "shaders": [shader]}) },
+                  headers={
+                      'User-Agent': 'My User Agent 1.0',
+                      'referer': f"https://www.shadertoy.com/view/{shader}"
+                  })
+
+rr = r.json()[0]
+
+print("""
+// %s
+// https://www.shadertoy.com/view/%s
+// Created by %s in %s
+""" % (
+          rr['info']['name'], shader, rr['info']['username'], rr['info']['date']
+      )
+      )
+for l in rr['info']['description'].split("\n"):
+    print("//",l)
+
+for x in rr['renderpass']:
+    print(x['code'])
+    # print(x.keys())

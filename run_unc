@@ -1,0 +1,14 @@
+#!/bin/bash
+
+for x in *.shader; do uncrustify --detect -f "$x" >"$x.unc"; uncrustify -c "$x.unc" -o "$x.unc.doc" --update-config-with-doc ; done
+
+fdupes -r . --delete -N
+
+for unc in *.unc; do
+	for shader in *.shader; do
+		out=$(uncrustify -c "$unc" -f "$shader" --if-changed 2>/dev/null | wc -l)
+		if (( out > 0 )); then
+			vimdiff "$shader" <(uncrustify -c "$unc" -f "$shader")
+		fi
+	done
+done

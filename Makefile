@@ -4,4 +4,4 @@ uncrustify:
 	uncrustify -c uncrustify.conf \
 		--replace --if-changed --no-backup \
 		-q \
-		shaders/*.shader
+		shaders/*.shader template.shader

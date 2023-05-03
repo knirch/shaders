@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Generates uncrustify.conf with uncrustifys detection method for each source
+# file. It will only keep unique configs and discard the ones that does not
+# generate any code changes.
+#
+# The general idea is to use this for keeping the configuration up to date, and
+# hopefully make transitioning between versions of uncrustify easier. The
+# usefulness of this script has not beed tested or proven in any way, it's
+# based purely on speculation.
+
+_tmp_workdir=$(mktemp -dt "${0##*/}.XXXXXX"); export TMPDIR=$_tmp_workdir
+cleanup() { ls -l "$_tmp_workdir"; rm -rf "$_tmp_workdir"; }
+
+for shader in *.shader; do
+	tmp=$(mktemp)
+	uncrustify --detect -c uncrustify.conf -f "$shader" >"$tmp"
+	uncrustify -c "$tmp" -o "$shader.uncrustify.conf" --update-config-with-doc
+done
+
+# Original config md5
+read -r orig _ < <(uncrustify -c uncrustify.conf --update-config-with-doc | md5sum)
+# Dumb de-dupe
+while read -r md5 file; do
+	if [[ $md5 == $previous_md5 || $md5 == $orig ]]; then
+		rm "$file"
+	fi
+	previous_md5=$md5
+done < <(md5sum *.shader.uncrustify.conf | sort)
+
+for conf in *.shader.uncrustify.conf; do
+	if ! out=$(uncrustify -c "$conf" -q --check *.shader 2>&1 >/dev/null); then
+		echo "$conf:"
+		echo "$out"
+		echo
+	else
+		rm "$conf"
+	fi
+done
