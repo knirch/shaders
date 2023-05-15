@@ -5,19 +5,22 @@
 // CC BY-NC-SA 3.0 https://creativecommons.org/licenses/by-nc-sa/3.0/
 
 // Utility macro as I'm too dumb to figure out how to do it as a #define float3x3...
-#define transpose(m) float3x3(m[0][0], m[1][0], m[2][0], \
-	                      m[0][1], m[1][1], m[2][1], \
-	                      m[0][2], m[1][2], m[2][2])
+#define transpose(m) \
+	float3x3(m[0][0], m[1][0], m[2][0], \
+	         m[0][1], m[1][1], m[2][1], \
+	         m[0][2], m[1][2], m[2][2])
 
 // Shadertoy -> OBS-Shaderfilter
 #define iResolution float4((uv_size - uv_offset) / uv_scale, uv_pixel_interval)
 
-#define yuv_2_rgb transpose(float3x3(1.0, 1.0, 1.0, \
-	                             0.0, -0.39465, 2.03211, \
-	                             1.13983, -0.58060, 0.0))
-#define rgb_2_yuv transpose(float3x3(0.299, -0.14713, 0.615, \
-	                             0.587, -0.28886, -0.51499, \
-	                             0.114, 0.436, -0.10001))
+#define yuv_2_rgb \
+	transpose(float3x3(1.0, 1.0, 1.0,          \
+	                   0.0, -0.39465, 2.03211, \
+	                   1.13983, -0.58060, 0.0))
+#define rgb_2_yuv \
+	transpose(float3x3(0.299, -0.14713, 0.615,    \
+	                   0.587, -0.28886, -0.51499, \
+	                   0.114, 0.436, -0.10001))
 
 float edge(float2 uv, float stepsize) {
 	float x = length(image.Sample(textureSampler, uv - float2(stepsize, 0.0)).rgb -
