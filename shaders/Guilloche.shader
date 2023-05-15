@@ -42,9 +42,7 @@ float2x2 rotate2d(float cangle) {
 
 float4 mainImage(VertData v_in) : TARGET {
 	float result = 0.0;
-	// input texture from channel 0
 	float4 tex = image.Sample(textureSampler, v_in.uv);
-	// float t;
 	float t = float(tex.x);
 
 	// diagonal waves
@@ -66,10 +64,8 @@ float4 mainImage(VertData v_in) : TARGET {
 	// increase contrast
 	result = smoothstep(0.6, 1.0, result);
 	// add some color
-	// float3 colored = float3(result+color,result+color,result+color);
 	float3 colored = float3(result + color);
 
-	// output to screen
 	return float4(colored, 1.0);
 }
 
